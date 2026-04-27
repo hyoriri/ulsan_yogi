@@ -1,0 +1,1104 @@
+<!doctype html>
+<html lang="ko" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>울산, 여기 어때?</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&amp;family=Playfair+Display:ital,wght@0,700;1,400&amp;family=Gowun+Batang:wght@400;700&amp;display=swap" rel="stylesheet">
+  <style>
+  html, body { height: 100%; margin: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; }
+  .serif { font-family: 'Gowun Batang', serif; }
+  .display { font-family: 'Playfair Display', serif; }
+
+  /* Walking motion keyframes */
+  @keyframes walkIn {
+    0% { opacity: 0; transform: translateY(60px) scale(0.97); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes footstep {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pathDraw {
+    0% { stroke-dashoffset: 1000; }
+    100% { stroke-dashoffset: 0; }
+  }
+  @keyframes floatUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes gentlePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .walk-in { animation: walkIn 0.8s ease-out forwards; opacity: 0; }
+  .footstep-anim { animation: footstep 1.5s ease-in-out infinite; }
+  .float-up { animation: floatUp 0.6s ease-out forwards; opacity: 0; }
+  .gentle-pulse { animation: gentlePulse 3s ease-in-out infinite; }
+
+  /* Walking path dots */
+  .walk-path { position: relative; }
+  .walk-path::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: repeating-linear-gradient(to bottom, #a78b6e 0px, #a78b6e 6px, transparent 6px, transparent 14px);
+    opacity: 0.4;
+  }
+
+  /* Spot card */
+  .spot-card {
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .spot-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  }
+
+  /* Image container */
+  .img-wrap {
+    overflow: hidden;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e8dfd4 0%, #d4cdc2 100%);
+  }
+  .img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+    display: block;
+  }
+  .img-wrap a {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .spot-card:hover .img-wrap img {
+    transform: scale(1.07);
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, padding 0.3s ease;
+  }
+  .detail-panel.open {
+    max-height: 2000px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  /* Hero parallax */
+  .hero-bg {
+    background: linear-gradient(135deg, #1a2332 0%, #2d3a4a 30%, #3e4f5f 60%, #1a2332 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(167,139,110,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 80%, rgba(90,130,160,0.1) 0%, transparent 50%);
+  }
+  .hero-bg::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 120px;
+    background: linear-gradient(to top, #f5f0eb, transparent);
+  }
+
+  /* Walking footprints in hero */
+  .footprint {
+    position: absolute;
+    width: 12px;
+    height: 18px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* Season badges */
+  .season-spring { background: #f0e6f6; color: #8b5aa6; }
+  .season-summer { background: #e6f5e6; color: #4a8b4a; }
+  .season-autumn { background: #fef3e2; color: #c47e2a; }
+  .season-winter { background: #e6f0f8; color: #4a7a9b; }
+  .season-all { background: #f0ede8; color: #7a6f5f; }
+
+  /* Language selector */
+  .lang-btn.active {
+    background: #3e4f5f;
+    color: #fff;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f5f0eb; }
+  ::-webkit-scrollbar-thumb { background: #c4b5a3; border-radius: 3px; }
+
+  /* Distance badge shimmer */
+  .dist-badge {
+    background: linear-gradient(90deg, #e8dfd4, #f5efe8, #e8dfd4);
+    background-size: 200% 100%;
+  }
+  .dist-badge.calculating {
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Map link button */
+  .map-link {
+    transition: all 0.3s ease;
+  }
+  .map-link:hover {
+    transform: translateX(3px);
+  }
+</style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-[#f5f0eb] text-[#2d2a26] overflow-auto">
+  <div id="app" class="w-full h-full"><!-- Language Bar -->
+   <nav class="fixed top-0 left-0 right-0 z-50 bg-[#1a2332]/90 backdrop-blur-md border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between"><span class="text-white/70 text-sm serif" id="nav-title">울산, 여기 어때?</span>
+     <div class="flex gap-1" id="lang-buttons"><button class="lang-btn active px-3 py-1 rounded-full text-xs text-white/70 hover:text-white transition" data-lang="ko">한국어</button> <button class="lang-btn px-3 py-1 rounded-full text-xs text-white/70 hover:text-white transition" data-lang="en">EN</button> <button class="lang-btn px-3 py-1 rounded-full text-xs text-white/70 hover:text-white transition" data-lang="ja">日本語</button> <button class="lang-btn px-3 py-1 rounded-full text-xs text-white/70 hover:text-white transition" data-lang="zh">中文</button>
+     </div>
+    </div>
+   </nav><!-- Hero -->
+   <header class="hero-bg relative pt-20 pb-32 px-4 text-center"><!-- Footprints decoration -->
+    <div class="footprint" style="left:20%;top:30%;transform:rotate(-15deg);animation:footstep 2s ease-in-out 0s infinite"></div>
+    <div class="footprint" style="left:23%;top:38%;transform:rotate(-10deg);animation:footstep 2s ease-in-out 0.3s infinite"></div>
+    <div class="footprint" style="left:27%;top:46%;transform:rotate(-5deg);animation:footstep 2s ease-in-out 0.6s infinite"></div>
+    <div class="footprint" style="left:32%;top:54%;transform:rotate(0deg);animation:footstep 2s ease-in-out 0.9s infinite"></div>
+    <div class="footprint" style="left:38%;top:61%;transform:rotate(5deg);animation:footstep 2s ease-in-out 1.2s infinite"></div>
+    <div class="relative z-10 max-w-3xl mx-auto pt-12">
+     <p class="text-[#a78b6e] text-sm tracking-[0.3em] uppercase mb-4 float-up" style="animation-delay:0.2s" data-i18n="hero_label">ULSAN LOCAL GUIDE</p>
+     <h1 id="hero-title" class="text-white text-4xl md:text-6xl font-bold serif leading-tight mb-6 float-up" style="animation-delay:0.4s">울산, 여기 어때?</h1>
+     <p id="hero-subtitle" class="text-white/60 text-lg md:text-xl serif mb-10 float-up" style="animation-delay:0.6s" data-i18n="hero_subtitle">걸으며 발견하는 울산의 숨은 명소들</p><!-- Location Input -->
+     <div class="float-up bg-white/10 backdrop-blur-md rounded-2xl p-4 md:p-6 border border-white/10" style="animation-delay:0.8s">
+      <p class="text-white/50 text-sm mb-3" data-i18n="location_prompt">📍 내 위치를 입력하면 가까운 순으로 정렬됩니다</p>
+      <div class="flex flex-col sm:flex-row gap-3"><input id="location-input" type="text" placeholder="예: 울산역, 태화동..." data-i18n-placeholder="location_placeholder" class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-white/40 focus:outline-none focus:border-[#a78b6e] transition"> <button id="gps-btn" onclick="getMyLocation()" class="flex items-center justify-center gap-2 bg-[#a78b6e] hover:bg-[#8b7258] text-white px-5 py-3 rounded-xl transition font-medium"> <i data-lucide="navigation" style="width:16px;height:16px"></i> <span data-i18n="gps_btn">현재 위치</span> </button> <button id="search-btn" onclick="searchLocation()" class="flex items-center justify-center gap-2 bg-[#3e4f5f] hover:bg-[#2d3a4a] text-white px-5 py-3 rounded-xl transition font-medium"> <i data-lucide="search" style="width:16px;height:16px"></i> <span data-i18n="search_btn">검색</span> </button>
+      </div>
+      <p id="location-status" class="text-white/40 text-xs mt-2 hidden"></p>
+     </div>
+    </div>
+   </header><!-- Spots Section -->
+   <main class="max-w-5xl mx-auto px-4 -mt-16 relative z-10 pb-20"><!-- Category Filters -->
+    <div class="flex flex-wrap gap-2 mb-8 justify-center" id="category-filters"><button class="cat-btn active bg-[#3e4f5f] text-white px-4 py-2 rounded-full text-sm transition" data-cat="all" data-i18n="cat_all">전체</button> <button class="cat-btn bg-white text-[#5a6a70] px-4 py-2 rounded-full text-sm hover:bg-[#3e4f5f] hover:text-white transition" data-cat="junggu" data-i18n="cat_junggu">중구</button> <button class="cat-btn bg-white text-[#5a6a70] px-4 py-2 rounded-full text-sm hover:bg-[#3e4f5f] hover:text-white transition" data-cat="trail" data-i18n="cat_trail">산책로</button> <button class="cat-btn bg-white text-[#5a6a70] px-4 py-2 rounded-full text-sm hover:bg-[#3e4f5f] hover:text-white transition" data-cat="namgu" data-i18n="cat_namgu">남구</button>
+    </div><!-- Walking path container -->
+    <div id="spots-container" class="walk-path pl-10 md:pl-16 space-y-8"><!-- Spots will be rendered here by JS -->
+    </div>
+   </main><!-- Footer -->
+   <footer class="bg-[#1a2332] text-white/40 text-center py-8 px-4">
+    <p class="serif text-sm" data-i18n="footer">울산의 아름다운 길 위에서, 당신만의 이야기를 만들어 보세요.</p>
+    <p class="text-xs mt-2">© 2025 울산, 여기 어때?</p>
+   </footer>
+  </div>
+  <script>
+// ===== DATA =====
+const SPOTS = [
+  {
+    id: 'daewangam',
+    cat: 'junggu',
+    lat: 35.4961,
+    lng: 129.4368,
+    naverMap: 'https://map.naver.com/p/search/%EB%8C%80%EC%99%95%EC%95%94%EA%B3%B5%EC%9B%90',
+    googleMap: 'https://www.google.com/maps/search/%EB%8C%80%EC%99%95%EC%95%94%EA%B3%B5%EC%9B%90',
+    imgPlaceholder: '🪨',
+    imgHtml: '<a href="https://ibb.co/ccbM4jRY"><img src="https://i.ibb.co/ccbM4jRY/01.jpg" alt="01" border="0"></a>" alt="대왕암공원" loading="lazy" onerror="console.error(\'Image failed\', this.src); this.style.background=\'#e8dfd4\'; this.alt=\'이미지 로드 실패\';" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '대왕암공원',
+        area: '중구 · 울주군 간절곶 방면',
+        desc: '울산 동쪽 끝자락, 거대한 바위가 용처럼 바다를 향해 뻗어 있는 곳. 수령 100년 이상의 해송 숲이 바람에 흔들리고, 출렁다리 너머로 펼쳐지는 동해 수평선이 가슴을 탁 트이게 합니다.',
+        detail: '울기등대에서 시작되는 산책로를 따라 약 20분 걸으면 대왕암에 도착합니다. 해안 데크길이 잘 정비되어 있어 가볍게 걷기 좋으며, 바위 틈새로 부서지는 파도 소리가 일상의 피로를 씻어줍니다. 일출 명소로도 유명하며, 특히 새해 해맞이 때 수만 명이 찾는 울산 대표 관광지입니다.',
+        tips: '🌅 일출 시간 30분 전 도착 추천\n👟 바위가 미끄러울 수 있으니 운동화 필수\n🅿️ 주차장은 이른 아침에 여유 있음\n📸 출렁다리 위에서 촬영 포인트 최고',
+        seasons: '봄: 해송 숲 사이 야생화 | 여름: 시원한 바닷바람, 해수욕 가능 | 가을: 억새와 바다의 조화 | 겨울: 일출 명소, 동백꽃',
+        caution: '⚠️ 파도가 높은 날 바위 접근 금지\n⚠️ 출렁다리 강풍 시 통제될 수 있음\n🐕 반려동물 동반 가능 (리드줄 필수)',
+        seasonBadge: '사계절',
+        seasonClass: 'season-all'
+      },
+      en: {
+        name: 'Daewangam Park',
+        area: 'Jung-gu · East Coast',
+        desc: 'A dramatic rock formation stretching into the East Sea like a dragon, surrounded by century-old pine forests and connected by a thrilling suspension bridge.',
+        detail: 'A 20-minute coastal walk from Ulgi Lighthouse leads you to the magnificent Daewangam Rock. Well-maintained wooden deck trails wind through pine groves along the cliffs. Famous for sunrise viewing, this is Ulsan\'s most iconic natural landmark.',
+        tips: '🌅 Arrive 30 min before sunrise\n👟 Wear sneakers (slippery rocks)\n🅿️ Parking available, early morning best\n📸 Best photo spot: on the suspension bridge',
+        seasons: 'Spring: Wildflowers | Summer: Cool sea breeze | Autumn: Pampas grass | Winter: Sunrise, Camellia',
+        caution: '⚠️ Stay off rocks during high waves\n⚠️ Bridge may close in strong wind\n🐕 Pets allowed on leash',
+        seasonBadge: 'All Year',
+        seasonClass: 'season-all'
+      },
+      ja: {
+        name: '大王岩公園',
+        area: '中区 · 東海岸',
+        desc: '龍のように海へ伸びる巨大な岩と、樹齢100年以上の海松林。吊り橋の向こうに広がる東海の水平線が圧巻です。',
+        detail: '蔚山灯台から約20分の海岸散策路で大王岩に到着。整備されたデッキ道を歩きながら、岩に砕ける波の音を楽しめます。日の出スポットとしても有名です。',
+        tips: '🌅 日の出30分前到着推奨\n👟 運動靴必須（岩が滑りやすい）\n🅿️ 早朝は駐車場に余裕あり\n📸 吊り橋からの撮影がベスト',
+        seasons: '春: 野花 | 夏: 涼しい海風 | 秋: ススキ | 冬: 日の出、椿',
+        caution: '⚠️ 高波時は岩場立入禁止\n⚠️ 強風時は吊り橋通行止め\n🐕 ペットOK（リード必須）',
+        seasonBadge: '通年',
+        seasonClass: 'season-all'
+      },
+      zh: {
+        name: '大王岩公园',
+        area: '中区 · 东海岸',
+        desc: '巨大的岩石如龙般伸向东海，周围环绕着百年松树林，悬索桥连接着壮观的海岸风光。',
+        detail: '从蔚山灯塔沿海岸步道步行约20分钟即可到达大王岩。木栈道维护良好，可以一边散步一边欣赏海浪拍打岩石的声音。这里也是著名的日出观赏地。',
+        tips: '🌅 建议日出前30分钟到达\n👟 穿运动鞋（岩石湿滑）\n🅿️ 清晨停车位充足\n📸 悬索桥上拍照最佳',
+        seasons: '春: 野花 | 夏: 凉爽海风 | 秋: 芒草 | 冬: 日出、山茶花',
+        caution: '⚠️ 大浪时禁止靠近岩石\n⚠️ 强风时悬索桥可能关闭\n🐕 可带宠物（须牵绳）',
+        seasonBadge: '全年',
+        seasonClass: 'season-all'
+      }
+    }
+  },
+  {
+    id: 'ganjeolgot',
+    cat: 'junggu',
+    lat: 35.3621,
+    lng: 129.3577,
+    naverMap: 'https://map.naver.com/p/search/%EA%B0%84%EC%A0%88%EA%B3%B6',
+    googleMap: 'https://www.google.com/maps/search/%EA%B0%84%EC%A0%88%EA%B3%B6',
+    imgPlaceholder: '🌊',
+    imgHtml: '<a href="https://ibb.co/5g6DnnSW"><img src="https://i.ibb.co/5g6DnnSW/02.jpg" alt="02" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '간절곶',
+        area: '중구 · 울주군',
+        desc: '한반도에서 가장 먼저 해가 뜨는 곳. 소망 우체통에 편지를 넣고, 동해의 첫 빛을 온몸으로 맞이해 보세요.',
+        detail: '간절곶은 영일만 호미곶보다 1분 먼저 해가 뜨는 대한민국 최동단 육지입니다. 높이 5m의 거대한 소망 우체통이 상징물이며, 실제로 편지를 부칠 수 있습니다. 해안 산책로를 따라 진하해수욕장까지 이어지는 코스가 인기입니다.',
+        tips: '✉️ 소망우체통에 실제 편지 투함 가능\n☕ 근처 카페에서 바다 뷰 즐기기\n🚗 진하해수욕장 연계 코스 추천\n🌅 새해 첫 해맞이 축제 개최',
+        seasons: '봄: 유채꽃밭 | 여름: 진하해변 연계 | 가을: 갈대 군락 | 겨울: 대한민국 첫 일출',
+        caution: '⚠️ 겨울 해맞이 시 극심한 혼잡\n⚠️ 해안가 바람이 세니 따뜻하게\n📌 일출 시간 사전 확인 필수',
+        seasonBadge: '겨울 추천',
+        seasonClass: 'season-winter'
+      },
+      en: {
+        name: 'Ganjeolgot Cape',
+        area: 'Jung-gu · Ulju-gun',
+        desc: 'The first place on the Korean peninsula to see sunrise. Drop a wish letter in the giant mailbox and welcome the first light of the East Sea.',
+        detail: 'Ganjeolgot sees the sunrise 1 minute earlier than Homigot. Its iconic 5-meter wish mailbox actually delivers letters. A coastal trail connects to Jinha Beach for an extended walk.',
+        tips: '✉️ Mail a real letter at the wish mailbox\n☕ Ocean view cafes nearby\n🚗 Combine with Jinha Beach\n🌅 New Year sunrise festival',
+        seasons: 'Spring: Rapeseed flowers | Summer: Beach combo | Autumn: Reed fields | Winter: Korea\'s first sunrise',
+        caution: '⚠️ Extreme crowds at New Year\n⚠️ Very windy, dress warmly\n📌 Check sunrise time in advance',
+        seasonBadge: 'Winter Pick',
+        seasonClass: 'season-winter'
+      },
+      ja: {
+        name: '艮絶岬',
+        area: '中区 · 蔚州郡',
+        desc: '韓半島で最も早く日が昇る場所。巨大な願いのポストに手紙を入れて、東海の最初の光を浴びましょう。',
+        detail: 'ホミ岬より1分早く日の出を迎える韓国最東端の岬。高さ5mの願いのポストが象徴で、実際に手紙を投函できます。',
+        tips: '✉️ 願いのポストに実際に投函可能\n☕ 近くのカフェで海景色\n🚗 ジナ海水浴場と組み合わせ推奨\n🌅 新年日の出祭り開催',
+        seasons: '春: 菜の花 | 夏: ビーチ | 秋: ススキ | 冬: 韓国初の日の出',
+        caution: '⚠️ 新年は大混雑\n⚠️ 風が強いので防寒必須\n📌 日の出時刻を事前確認',
+        seasonBadge: '冬おすすめ',
+        seasonClass: 'season-winter'
+      },
+      zh: {
+        name: '艮绝岬',
+        area: '中区 · 蔚州郡',
+        desc: '韩半岛最早看到日出的地方。在巨大的许愿邮筒投入一封信，迎接东海的第一缕阳光。',
+        detail: '比虎尾岬早1分钟看到日出的韩国最东端陆地。5米高的许愿邮筒是地标，可以实际投递信件。',
+        tips: '✉️ 可在许愿邮筒投递真实信件\n☕ 附近有海景咖啡厅\n🚗 推荐与镇下海水浴场联游\n🌅 新年日出节',
+        seasons: '春: 油菜花 | 夏: 海滩联游 | 秋: 芦苇 | 冬: 韩国第一日出',
+        caution: '⚠️ 新年极度拥挤\n⚠️ 风大注意保暖\n📌 提前确认日出时间',
+        seasonBadge: '冬季推荐',
+        seasonClass: 'season-winter'
+      }
+    }
+  },
+  {
+    id: 'dongheon',
+    cat: 'junggu',
+    lat: 35.5531,
+    lng: 129.3133,
+    naverMap: 'https://map.naver.com/p/search/%EC%9A%B8%EC%82%B0+%EB%8F%99%ED%97%8C+%EB%82%B4%EC%95%84',
+    googleMap: 'https://www.google.com/maps/search/%EC%9A%B8%EC%82%B0+%EB%8F%99%ED%97%8C+%EB%82%B4%EC%95%84',
+    imgPlaceholder: '🏛️',
+    imgHtml: '<a href="https://ibb.co/MyR8QdY6"><img src="https://i.ibb.co/MyR8QdY6/03.jpg" alt="03" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '동헌 및 내아',
+        area: '중구 · 북정동',
+        desc: '조선시대 울산부사가 집무하던 관아 건물. 고즈넉한 한옥 마당에서 울산의 역사를 조용히 걸어보세요.',
+        detail: '울산 동헌은 조선시대 지방관이 공무를 처리하던 곳으로, 내아는 관아의 살림채입니다. 최근 복원 정비를 거쳐 아름다운 한옥 건축미를 감상할 수 있으며, 울산 중구의 도심 속 숨은 역사 공간입니다. 인근 병영성지, 울산향교와 연계해서 방문하면 울산의 역사를 더 깊이 느낄 수 있습니다.',
+        tips: '🏛️ 무료 관람 (별도 예약 불필요)\n📷 한복 체험 촬영지로 인기\n🚶 울산향교까지 도보 15분\n📚 해설사 프로그램 운영 (문의 필요)',
+        seasons: '봄: 매화·벚꽃과 한옥의 조화 | 여름: 그늘진 마당에서 휴식 | 가을: 단풍과 고즈넉한 정취 | 겨울: 설경의 한옥 풍경',
+        caution: '⚠️ 건물 내부 출입 제한 구역 확인\n⚠️ 조용한 장소이므로 매너 관람\n📌 주차 공간 협소 (대중교통 추천)',
+        seasonBadge: '가을 추천',
+        seasonClass: 'season-autumn'
+      },
+      en: {
+        name: 'Dongheon & Naea',
+        area: 'Jung-gu · Bukjeong-dong',
+        desc: 'A Joseon-era magistrate office with serene hanok courtyards. Walk through Ulsan\'s quiet history in the heart of the city.',
+        detail: 'The Dongheon was where the Ulsan magistrate handled official affairs during the Joseon Dynasty. Recently restored, it showcases beautiful traditional Korean architecture. Combine with visits to nearby Byeongyeong Fortress and Ulsan Hyanggyo.',
+        tips: '🏛️ Free admission, no reservation needed\n📷 Popular for hanbok photo shoots\n🚶 15-min walk to Ulsan Hyanggyo\n📚 Guide programs available (inquire)',
+        seasons: 'Spring: Plum blossoms with hanok | Summer: Shaded courtyard rest | Autumn: Fall colors | Winter: Snow-covered hanok',
+        caution: '⚠️ Some interior areas restricted\n⚠️ Please keep quiet\n📌 Limited parking (use public transit)',
+        seasonBadge: 'Autumn Pick',
+        seasonClass: 'season-autumn'
+      },
+      ja: {
+        name: '東軒・内衙',
+        area: '中区 · 北亭洞',
+        desc: '朝鮮時代の官庁建物。静かな韓屋の庭で蔚山の歴史を散策しましょう。',
+        detail: '朝鮮時代の地方官が公務を行った場所で、最近復元され美しい韓屋建築を楽しめます。近くの兵営城址や蔚山郷校と合わせて訪問がおすすめ。',
+        tips: '🏛️ 入場無料（予約不要）\n📷 韓服体験の撮影に人気\n🚶 蔚山郷校まで徒歩15分\n📚 ガイドプログラムあり',
+        seasons: '春: 梅・桜と韓屋 | 夏: 日陰の庭で休憩 | 秋: 紅葉 | 冬: 雪景色の韓屋',
+        caution: '⚠️ 一部内部立入制限あり\n⚠️ 静かにご観覧ください\n📌 駐車場狭い（公共交通推奨）',
+        seasonBadge: '秋おすすめ',
+        seasonClass: 'season-autumn'
+      },
+      zh: {
+        name: '东轩及内衙',
+        area: '中区 · 北亭洞',
+        desc: '朝鲜时代的官府建筑。在宁静的韩屋庭院中漫步蔚山历史。',
+        detail: '朝鲜时代地方官办公之所，近期修复后可欣赏美丽的韩屋建筑。建议与附近的兵营城址和蔚山乡校一起参观。',
+        tips: '🏛️ 免费参观（无需预约）\n📷 韩服拍照热门地\n🚶 步行15分钟到蔚山乡校\n📚 有讲解服务（需咨询）',
+        seasons: '春: 梅花樱花与韩屋 | 夏: 阴凉庭院休息 | 秋: 红叶 | 冬: 雪中韩屋',
+        caution: '⚠️ 部分区域限制进入\n⚠️ 请安静参观\n📌 停车位有限（推荐公共交通）',
+        seasonBadge: '秋季推荐',
+        seasonClass: 'season-autumn'
+      }
+    }
+  },
+  {
+    id: 'hamwollu',
+    cat: 'junggu',
+    lat: 35.5539,
+    lng: 129.3121,
+    naverMap: 'https://map.naver.com/p/search/%ED%95%A8%EC%9B%94%EB%A3%A8',
+    googleMap: 'https://www.google.com/maps/search/%ED%95%A8%EC%9B%94%EB%A3%A8+%EC%9A%B8%EC%82%B0',
+    imgPlaceholder: '🌙',
+    imgHtml: '<a href="https://ibb.co/8gDhyB3M"><img src="https://i.ibb.co/8gDhyB3M/04.jpg" alt="04" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '함월루',
+        area: '중구 · 북정동',
+        desc: '"달을 품다"라는 이름의 누각. 동헌 옆에 자리한 이곳에서 옛 선비의 풍류를 느껴보세요.',
+        detail: '함월루(含月樓)는 "달을 머금은 누각"이라는 뜻으로, 동헌 및 내아와 함께 울산 관아의 일부였습니다. 높은 기단 위에 세워진 누각에서 바라보는 풍경이 아름다우며, 특히 보름달이 뜨는 밤이면 이름값을 합니다. 한옥의 곡선미와 목조 건축의 정교함을 가까이에서 감상할 수 있습니다.',
+        tips: '🌙 보름달 밤 방문 추천 (음력 15일)\n📷 야간 조명이 아름다운 포토스팟\n🚶 동헌·내아와 함께 관람\n🍵 인근 전통 찻집에서 차 한잔',
+        seasons: '봄: 밤벚꽃 야경 | 여름: 시원한 누각 바람 | 가을: 달맞이 명소 | 겨울: 야간 조명 감상',
+        caution: '⚠️ 누각 위 출입 시간 확인\n⚠️ 야간 방문 시 주변 어두울 수 있음\n📌 동헌과 함께 방문 추천',
+        seasonBadge: '가을 추천',
+        seasonClass: 'season-autumn'
+      },
+      en: {
+        name: 'Hamwollu Pavilion',
+        area: 'Jung-gu · Bukjeong-dong',
+        desc: 'A pavilion whose name means "embracing the moon." Feel the elegance of ancient scholars beside the Dongheon.',
+        detail: 'Hamwollu (含月樓) means "pavilion that holds the moon." Part of the old Ulsan magistrate complex, it offers beautiful views from its elevated platform, especially under full moonlight.',
+        tips: '🌙 Visit during full moon (15th lunar day)\n📷 Beautiful night lighting for photos\n🚶 Visit with Dongheon & Naea\n🍵 Traditional teahouses nearby',
+        seasons: 'Spring: Night cherry blossoms | Summer: Cool pavilion breeze | Autumn: Moon viewing | Winter: Night illumination',
+        caution: '⚠️ Check pavilion access hours\n⚠️ Dark at night, bring a flashlight\n📌 Best combined with Dongheon visit',
+        seasonBadge: 'Autumn Pick',
+        seasonClass: 'season-autumn'
+      },
+      ja: {
+        name: '含月楼',
+        area: '中区 · 北亭洞',
+        desc: '「月を抱く楼閣」という名の亭。東軒の隣で昔の風流を感じましょう。',
+        detail: '含月楼は蔚山官衙の一部で、高い基壇の上から眺める景色が美しく、特に満月の夜は格別です。',
+        tips: '🌙 満月の夜がおすすめ\n📷 夜間ライトアップが美しい\n🚶 東軒と一緒に観覧\n🍵 近くに伝統茶屋あり',
+        seasons: '春: 夜桜 | 夏: 涼しい風 | 秋: 月見の名所 | 冬: 夜間照明',
+        caution: '⚠️ 楼閣のアクセス時間確認\n⚠️ 夜は暗いので懐中電灯持参\n📌 東軒と合わせて訪問推奨',
+        seasonBadge: '秋おすすめ',
+        seasonClass: 'season-autumn'
+      },
+      zh: {
+        name: '含月楼',
+        area: '中区 · 北亭洞',
+        desc: '"含月"之名的楼阁。在东轩旁感受古代文人的风雅。',
+        detail: '含月楼是蔚山官衙的一部分，高台上的楼阁景色优美，满月之夜尤为动人。',
+        tips: '🌙 推荐满月夜访问\n📷 夜间灯光很美，适合拍照\n🚶 与东轩一起参观\n🍵 附近有传统茶馆',
+        seasons: '春: 夜樱 | 夏: 凉爽微风 | 秋: 赏月名所 | 冬: 夜间灯光',
+        caution: '⚠️ 确认楼阁开放时间\n⚠️ 夜间较暗，带手电\n📌 建议与东轩一起参观',
+        seasonBadge: '秋季推荐',
+        seasonClass: 'season-autumn'
+      }
+    }
+  },
+  {
+    id: 'taehwagang',
+    cat: 'trail',
+    lat: 35.5462,
+    lng: 129.2927,
+    naverMap: 'https://map.naver.com/p/search/%ED%83%9C%ED%99%94%EA%B0%95+%EA%B5%AD%EA%B0%80%EC%A0%95%EC%9B%90',
+    googleMap: 'https://www.google.com/maps/search/%ED%83%9C%ED%99%94%EA%B0%95+%EA%B5%AD%EA%B0%80%EC%A0%95%EC%9B%90',
+    imgPlaceholder: '🎋',
+    imgHtml: '<a href="https://ibb.co/6JfNjQK2"><img src="https://i.ibb.co/6JfNjQK2/001.jpg" alt="001" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '태화강 국가정원',
+        area: '산책로 · 태화동 일대',
+        desc: '도심 한가운데 대나무 바다. 십리대밭을 걸으면 바람 소리가 음악이 되고, 햇살이 대나무 사이로 쏟아집니다.',
+        detail: '태화강 국가정원은 국내 두 번째 국가정원으로 지정된 울산의 자랑입니다. 십리대밭(4km)은 국내 최대 도심 대숲으로, 대나무 터널 속을 걷는 경험은 잊을 수 없습니다. 정원 구역에는 무궁화원, 작약원, 수생식물원 등 테마 정원이 있고, 태화강 전망대에서는 울산 시가지와 강의 풍경을 한눈에 볼 수 있습니다.',
+        tips: '🎋 십리대밭 대나무 터널 필수 코스\n🌸 정원 구역 계절별 꽃 축제\n🔭 전망대에서 울산 전경 감상\n🚲 자전거 대여소 이용 가능\n🦢 겨울철 떼까마귀 군무 장관',
+        seasons: '봄: 작약·튤립 축제 | 여름: 대숲 그늘 산책 | 가을: 은행나무길 단풍 | 겨울: 떼까마귀 군무 (12~2월)',
+        caution: '⚠️ 자전거·보행자 구간 구분 주의\n⚠️ 여름 모기 대비 필요\n🐦 떼까마귀 시즌 배설물 주의\n📌 넓은 구역이므로 편한 신발 필수',
+        seasonBadge: '사계절',
+        seasonClass: 'season-all'
+      },
+      en: {
+        name: 'Taehwagang National Garden',
+        area: 'Trail · Taehwa-dong Area',
+        desc: 'A bamboo sea in the heart of the city. Walk through the 4km Simnidaebat bamboo grove where wind becomes music and sunlight filters through.',
+        detail: 'Korea\'s second designated national garden and Ulsan\'s pride. The Simnidaebat (4km) is Korea\'s largest urban bamboo forest. Themed gardens include Rose of Sharon, Peony, and Aquatic Plant gardens. The observatory offers panoramic city views.',
+        tips: '🎋 Bamboo tunnel walk is a must\n🌸 Seasonal flower festivals\n🔭 City panorama from observatory\n🚲 Bike rental available\n🦢 Winter starling murmuration spectacular',
+        seasons: 'Spring: Peony & Tulip festival | Summer: Shaded bamboo walks | Autumn: Ginkgo foliage | Winter: Starling murmuration (Dec-Feb)',
+        caution: '⚠️ Watch for bike/pedestrian zones\n⚠️ Mosquitoes in summer\n🐦 Bird droppings in starling season\n📌 Wear comfortable shoes (large area)',
+        seasonBadge: 'All Year',
+        seasonClass: 'season-all'
+      },
+      ja: {
+        name: '太和江国家庭園',
+        area: '散策路 · 太和洞一帯',
+        desc: '都心の真ん中に広がる竹の海。十里竹林を歩けば風の音が音楽になります。',
+        detail: '韓国で2番目の国家庭園。十里竹林（4km）は韓国最大の都心竹林で、テーマ庭園や展望台もあります。冬のムクドリの群舞は圧巻。',
+        tips: '🎋 竹トンネル散歩は必須\n🌸 季節の花祭り\n🔭 展望台から蔚山パノラマ\n🚲 レンタサイクルあり\n🦢 冬のムクドリ群舞',
+        seasons: '春: シャクヤク・チューリップ | 夏: 竹林の日陰散歩 | 秋: 銀杏紅葉 | 冬: ムクドリ群舞',
+        caution: '⚠️ 自転車・歩行者ゾーン注意\n⚠️ 夏は蚊対策必要\n📌 広いので歩きやすい靴で',
+        seasonBadge: '通年',
+        seasonClass: 'season-all'
+      },
+      zh: {
+        name: '太和江国家花园',
+        area: '散步路 · 太和洞一带',
+        desc: '都市中心的竹海。漫步4公里十里竹林，风声化作音乐，阳光穿透竹叶。',
+        detail: '韩国第二个国家花园。十里竹林是韩国最大的城市竹林，还有主题花园和观景台。冬季椋鸟群飞壮观。',
+        tips: '🎋 竹林隧道必走\n🌸 季节花卉节\n🔭 观景台眺望蔚山全景\n🚲 可租自行车\n🦢 冬季椋鸟群飞',
+        seasons: '春: 芍药郁金香 | 夏: 竹林阴凉散步 | 秋: 银杏红叶 | 冬: 椋鸟群飞(12-2月)',
+        caution: '⚠️ 注意自行车和步行区分\n⚠️ 夏季防蚊\n📌 面积大请穿舒适的鞋',
+        seasonBadge: '全年',
+        seasonClass: 'season-all'
+      }
+    }
+  },
+  {
+    id: 'gunggerang',
+    cat: 'namgu',
+    lat: 35.5267,
+    lng: 129.2956,
+    naverMap: 'https://map.naver.com/p/search/%EA%B6%81%EA%B1%B0%EB%9E%91+%EB%B2%9A%EA%BD%83%EA%B1%B0%EB%A6%AC',
+    googleMap: 'https://www.google.com/maps/search/%EA%B6%81%EA%B1%B0%EB%9E%91+%EB%B2%9A%EA%BD%83%EA%B1%B0%EB%A6%AC+%EC%9A%B8%EC%82%B0',
+    imgPlaceholder: '🌸',
+    imgHtml: '<a href="https://ibb.co/fG9k9jr9"><img src="https://i.ibb.co/fG9k9jr9/002.jpg" alt="002" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '궁거랑 벚꽃거리',
+        area: '남구 · 무거동',
+        desc: '봄이면 벚꽃 터널이 되는 꿈같은 거리. 분홍빛 꽃비가 내리는 이 길을 걸으면 누구나 시인이 됩니다.',
+        detail: '궁거랑은 울산 남구 무거천을 따라 조성된 벚꽃 명소입니다. 약 1.5km 구간에 벚나무가 빼곡히 심어져 있어, 만개 시기에는 하늘이 보이지 않을 정도의 벚꽃 터널이 만들어집니다. 밤에는 조명이 켜져 야간 벚꽃 산책도 가능합니다. 길을 따라 카페, 맛집도 많아 여유로운 봄나들이에 완벽합니다.',
+        tips: '🌸 만개 시기: 3월 말 ~ 4월 초\n🌙 야간 조명 벚꽃 산책 추천\n☕ 벚꽃길 따라 카페 거리\n📸 SNS 인생샷 명소\n🎵 벚꽃 축제 기간 버스킹 공연',
+        seasons: '봄: 벚꽃 만개 (핵심 시즌!) | 여름: 녹음 짙은 산책로 | 가을: 단풍 산책 | 겨울: 조용한 겨울 산책',
+        caution: '⚠️ 벚꽃 시즌 극심한 인파\n⚠️ 주차 매우 어려움 (대중교통 강추)\n📌 만개 시기는 기상에 따라 변동\n🗑️ 쓰레기는 꼭 되가져가기',
+        seasonBadge: '봄 필수',
+        seasonClass: 'season-spring'
+      },
+      en: {
+        name: 'Gunggerang Cherry Blossom Road',
+        area: 'Nam-gu · Mugeo-dong',
+        desc: 'A dreamlike tunnel of cherry blossoms each spring. Walk under pink petal rain and become a poet for a day.',
+        detail: 'A 1.5km cherry blossom paradise along Mugeo Stream. During full bloom, the canopy of flowers blocks the sky. Night illumination creates a magical evening stroll. Cafes and restaurants line the path.',
+        tips: '🌸 Full bloom: Late March ~ Early April\n🌙 Night-lit cherry blossom walks\n☕ Cafe street along the path\n📸 Instagram-worthy photo spots\n🎵 Busking during festival season',
+        seasons: 'Spring: Peak cherry blossoms! | Summer: Green canopy walk | Autumn: Fall foliage | Winter: Quiet winter stroll',
+        caution: '⚠️ Extreme crowds during bloom\n⚠️ No parking available (use transit)\n📌 Bloom timing varies with weather\n🗑️ Please take trash with you',
+        seasonBadge: 'Spring Must',
+        seasonClass: 'season-spring'
+      },
+      ja: {
+        name: '宮巨廊 桜並木通り',
+        area: '南区 · 無去洞',
+        desc: '春になると桜のトンネルになる夢のような道。ピンクの花びらが舞うこの道を歩けば誰もが詩人になります。',
+        detail: '無去川沿い約1.5kmの桜の名所。満開時は空が見えないほどの桜トンネルに。夜間ライトアップもあり、カフェやレストランも充実。',
+        tips: '🌸 満開時期: 3月末〜4月初\n🌙 夜間ライトアップ散歩\n☕ 桜並木沿いのカフェ\n📸 SNS映えスポット\n🎵 桜祭りのバスキング',
+        seasons: '春: 桜満開！ | 夏: 緑の散歩道 | 秋: 紅葉 | 冬: 静かな冬散歩',
+        caution: '⚠️ 桜シーズンは大混雑\n⚠️ 駐車困難（公共交通推奨）\n📌 開花時期は天候で変動\n🗑️ ゴミは持ち帰り',
+        seasonBadge: '春必見',
+        seasonClass: 'season-spring'
+      },
+      zh: {
+        name: '宫巨廊樱花路',
+        area: '南区 · 无去洞',
+        desc: '春天变成樱花隧道的梦幻街道。走在粉色花雨中，每个人都能成为诗人。',
+        detail: '沿无去川约1.5公里的樱花胜地。盛开时樱花遮天蔽日。夜间有灯光照明，沿路有很多咖啡厅和餐厅。',
+        tips: '🌸 盛开期: 3月底~4月初\n🌙 夜间灯光樱花散步\n☕ 樱花路旁咖啡街\n📸 网红打卡地\n🎵 樱花节街头演出',
+        seasons: '春: 樱花盛开！ | 夏: 绿荫步道 | 秋: 红叶 | 冬: 安静冬日散步',
+        caution: '⚠️ 樱花季人潮拥挤\n⚠️ 停车极难（推荐公共交通）\n📌 花期随天气变化\n🗑️ 请带走垃圾',
+        seasonBadge: '春季必去',
+        seasonClass: 'season-spring'
+      }
+    }
+  },
+  {
+    id: 'samsan',
+    cat: 'namgu',
+    lat: 35.5366,
+    lng: 129.3252,
+    naverMap: 'https://map.naver.com/p/search/%EC%82%BC%EC%82%B0%EB%8F%99+%EB%94%94%EC%9E%90%EC%9D%B8%EA%B1%B0%EB%A6%AC',
+    googleMap: 'https://www.google.com/maps/search/%EC%82%BC%EC%82%B0%EB%8F%99+%EB%94%94%EC%9E%90%EC%9D%B8%EA%B1%B0%EB%A6%AC+%EC%9A%B8%EC%82%B0',
+    imgPlaceholder: '🎨',
+    imgHtml: '<a href="https://ibb.co/7JCdcHNf"><img src="https://i.ibb.co/7JCdcHNf/003.jpg" alt="003" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '삼산동 디자인거리',
+        area: '남구 · 삼산동',
+        desc: '울산의 힙한 거리. 개성 넘치는 편집숍, 갤러리, 카페가 모여 있는 도심 속 문화 골목입니다.',
+        detail: '삼산동 디자인거리는 울산 남구의 트렌디한 문화 거리입니다. 독립 브랜드 편집숍, 소규모 갤러리, 디자이너 카페, 브런치 맛집이 골목골목 숨어 있습니다. 주말에는 플리마켓이 열리기도 하며, 울산의 젊은 문화와 예술을 체험할 수 있는 공간입니다. 인스타그램에서 "삼산디자인거리"로 검색하면 분위기를 미리 느낄 수 있습니다.',
+        tips: '🛍️ 독립 브랜드 편집숍 탐방\n🖼️ 소규모 갤러리 무료 관람\n☕ 디자이너 카페에서 여유\n🎪 주말 플리마켓 (비정기)\n🍽️ 브런치·디저트 맛집 다수',
+        seasons: '봄: 거리 테라스 카페 시즌 | 여름: 야외 전시·마켓 | 가을: 갤러리 시즌 | 겨울: 따뜻한 실내 카페 투어',
+        caution: '⚠️ 소규모 상점은 영업시간 확인\n⚠️ 주말 오후 혼잡\n📌 골목이 좁으므로 도보 추천\n💳 현금만 받는 곳도 있음',
+        seasonBadge: '사계절',
+        seasonClass: 'season-all'
+      },
+      en: {
+        name: 'Samsan-dong Design Street',
+        area: 'Nam-gu · Samsan-dong',
+        desc: 'Ulsan\'s hipster district. A cultural alley packed with indie shops, galleries, and designer cafes in the heart of the city.',
+        detail: 'A trendy cultural street featuring indie brand shops, small galleries, designer cafes, and brunch spots. Weekend flea markets add to the creative atmosphere. A perfect spot to experience Ulsan\'s young art scene.',
+        tips: '🛍️ Explore indie brand shops\n🖼️ Free gallery visits\n☕ Designer cafe hopping\n🎪 Weekend flea markets (irregular)\n🍽️ Great brunch & dessert spots',
+        seasons: 'Spring: Terrace cafe season | Summer: Outdoor exhibits | Autumn: Gallery season | Winter: Cozy indoor cafe tours',
+        caution: '⚠️ Check small shop hours\n⚠️ Crowded weekend afternoons\n📌 Narrow alleys, walk recommended\n💳 Some shops cash-only',
+        seasonBadge: 'All Year',
+        seasonClass: 'season-all'
+      },
+      ja: {
+        name: '三山洞デザインストリート',
+        area: '南区 · 三山洞',
+        desc: '蔚山のおしゃれストリート。個性的なセレクトショップ、ギャラリー、カフェが集まる文化の路地。',
+        detail: 'インディーブランドショップ、小規模ギャラリー、デザイナーカフェが並ぶトレンディな通り。週末はフリマも。蔚山の若い文化を体験できます。',
+        tips: '🛍️ インディーショップ巡り\n🖼️ ギャラリー無料見学\n☕ デザイナーカフェ\n🎪 週末フリーマーケット\n🍽️ ブランチの名店多数',
+        seasons: '春: テラスカフェ | 夏: 屋外展示 | 秋: ギャラリーシーズン | 冬: 室内カフェ巡り',
+        caution: '⚠️ 小規模店は営業時間確認\n⚠️ 週末午後は混雑\n📌 路地が狭いので徒歩推奨\n💳 現金のみの店もあり',
+        seasonBadge: '通年',
+        seasonClass: 'season-all'
+      },
+      zh: {
+        name: '三山洞设计街',
+        area: '南区 · 三山洞',
+        desc: '蔚山的时尚街区。充满个性的买手店、画廊、设计师咖啡厅汇聚的都市文化巷。',
+        detail: '集合独立品牌店、小型画廊、设计师咖啡厅和早午餐名店的潮流文化街。周末有跳蚤市场，体验蔚山年轻的艺术氛围。',
+        tips: '🛍️ 探访独立品牌店\n🖼️ 免费参观画廊\n☕ 设计师咖啡厅\n🎪 周末跳蚤市场\n🍽️ 早午餐甜点名店',
+        seasons: '春: 露台咖啡 | 夏: 户外展览 | 秋: 画廊季 | 冬: 温暖室内咖啡之旅',
+        caution: '⚠️ 小店营业时间需确认\n⚠️ 周末下午拥挤\n📌 巷子窄建议步行\n💳 部分店铺只收现金',
+        seasonBadge: '全年',
+        seasonClass: 'season-all'
+      }
+    }
+  },
+  {
+    id: 'jangsaengpo',
+    cat: 'namgu',
+    lat: 35.5082,
+    lng: 129.3728,
+    naverMap: 'https://map.naver.com/p/search/%EC%9E%A5%EC%83%9D%ED%8F%AC+%EA%B3%A0%EB%9E%98%EB%A7%88%EC%9D%84',
+    googleMap: 'https://www.google.com/maps/search/%EC%9E%A5%EC%83%9D%ED%8F%AC+%EA%B3%A0%EB%9E%98%EB%A7%88%EC%9D%84',
+    imgPlaceholder: '🐋',
+    imgHtml: '<a href="https://ibb.co/fGLB0Gh6"><img src="https://i.ibb.co/fGLB0Gh6/004.jpg" alt="004" border="0"></a>',
+    i18n: {
+      ko: {
+        name: '장생포 고래마을',
+        area: '남구 · 장생포',
+        desc: '고래와 함께한 울산의 이야기. 귀여운 벽화 마을부터 고래 박물관까지, 가족 나들이에 딱입니다.',
+        detail: '장생포는 한때 한국 포경 산업의 중심지였습니다. 지금은 고래 문화 마을로 변신하여, 고래박물관, 고래생태체험관, 고래문화마을이 조성되어 있습니다. 마을 골목골목에는 고래를 테마로 한 알록달록한 벽화가 가득하고, 옥상 전망대에서는 울산항과 바다를 조망할 수 있습니다. 아이들에게 특히 인기 있는 관광지입니다.',
+        tips: '🐋 고래박물관 관람 (유료)\n🎨 벽화마을 골목 산책\n🚢 고래 관광 크루즈 (계절 운항)\n👨‍👩‍👧‍👦 가족 체험 프로그램 다양\n🍽️ 고래고기 특화 음식점 (선택)',
+        seasons: '봄: 벚꽃과 벽화마을 | 여름: 고래 관광 크루즈 성수기 | 가을: 선선한 마을 산책 | 겨울: 실내 박물관 관람',
+        caution: '⚠️ 박물관 월요일 휴관 확인\n⚠️ 크루즈는 기상에 따라 취소 가능\n📌 주차장 있으나 주말 혼잡\n🎫 박물관·체험관 통합권 추천',
+        seasonBadge: '여름 추천',
+        seasonClass: 'season-summer'
+      },
+      en: {
+        name: 'Jangsaengpo Whale Village',
+        area: 'Nam-gu · Jangsaengpo',
+        desc: 'Ulsan\'s whale story. From colorful mural alleys to the whale museum, perfect for a family day out.',
+        detail: 'Once Korea\'s whaling hub, now transformed into a whale culture village with a museum, ecological experience center, and mural village. Rooftop views of Ulsan port. Especially popular with families.',
+        tips: '🐋 Whale Museum (paid admission)\n🎨 Mural village alley walk\n🚢 Whale watching cruise (seasonal)\n👨‍👩‍👧‍👦 Various family programs\n🍽️ Whale meat restaurants (optional)',
+        seasons: 'Spring: Cherry blossoms & murals | Summer: Whale cruise peak | Autumn: Cool village walks | Winter: Indoor museum visits',
+        caution: '⚠️ Museum closed Mondays\n⚠️ Cruises weather-dependent\n📌 Parking available but busy weekends\n🎫 Combined ticket recommended',
+        seasonBadge: 'Summer Pick',
+        seasonClass: 'season-summer'
+      },
+      ja: {
+        name: '長生浦クジラ村',
+        area: '南区 · 長生浦',
+        desc: 'クジラとともに歩んだ蔚山の物語。かわいい壁画村からクジラ博物館まで、家族におすすめ。',
+        detail: 'かつての韓国捕鯨の中心地が、クジラ文化村に変身。博物館、体験館、壁画村があり、屋上からは蔚山港が見えます。',
+        tips: '🐋 クジラ博物館（有料）\n🎨 壁画村散策\n🚢 クジラ観光クルーズ（季節運航）\n👨‍👩‍👧‍👦 家族体験プログラム\n🍽️ クジラ料理店',
+        seasons: '春: 桜と壁画 | 夏: クルーズ最盛期 | 秋: 涼しい散歩 | 冬: 室内博物館',
+        caution: '⚠️ 博物館は月曜休館\n⚠️ クルーズは天候で中止の場合あり\n📌 週末は駐車場混雑\n🎫 共通チケット推奨',
+        seasonBadge: '夏おすすめ',
+        seasonClass: 'season-summer'
+      },
+      zh: {
+        name: '长生浦鲸鱼村',
+        area: '南区 · 长生浦',
+        desc: '与鲸鱼相伴的蔚山故事。从可爱的壁画村到鲸鱼博物馆，非常适合家庭出游。',
+        detail: '曾是韩国捕鲸中心，现已转变为鲸鱼文化村，设有博物馆、体验馆和壁画村。屋顶可眺望蔚山港。',
+        tips: '🐋 鲸鱼博物馆（收费）\n🎨 壁画村小巷散步\n🚢 观鲸游船（季节性运营）\n👨‍👩‍👧‍👦 多种家庭体验项目\n🍽️ 鲸鱼料理餐厅',
+        seasons: '春: 樱花与壁画 | 夏: 游船旺季 | 秋: 凉爽村庄散步 | 冬: 室内博物馆',
+        caution: '⚠️ 博物馆周一休馆\n⚠️ 游船可能因天气取消\n📌 周末停车场拥挤\n🎫 推荐联票',
+        seasonBadge: '夏季推荐',
+        seasonClass: 'season-summer'
+      }
+    }
+  }
+];
+
+// ===== I18N =====
+const I18N = {
+  ko: {
+    hero_label: 'ULSAN LOCAL GUIDE',
+    hero_subtitle: '걸으며 발견하는 울산의 숨은 명소들',
+    location_prompt: '📍 내 위치를 입력하면 가까운 순으로 정렬됩니다',
+    location_placeholder: '예: 울산역, 태화동...',
+    gps_btn: '현재 위치',
+    search_btn: '검색',
+    cat_all: '전체',
+    cat_junggu: '중구',
+    cat_trail: '산책로',
+    cat_namgu: '남구',
+    detail_btn: '자세히 보기',
+    close_btn: '접기',
+    naver_map: '네이버 지도',
+    google_map: '구글 지도',
+    tips_title: '💡 꿀팁',
+    seasons_title: '🗓️ 계절별 즐기기',
+    caution_title: '⚠️ 주의사항',
+    distance_prefix: '약',
+    distance_suffix: '',
+    gps_loading: '위치를 찾고 있습니다...',
+    gps_found: '📍 위치를 찾았습니다!',
+    gps_error: '위치를 찾을 수 없습니다. 주소를 직접 입력해주세요.',
+    footer: '울산의 아름다운 길 위에서, 당신만의 이야기를 만들어 보세요.',
+    from_here: '여기서'
+  },
+  en: {
+    hero_label: 'ULSAN LOCAL GUIDE',
+    hero_subtitle: 'Discover hidden gems of Ulsan on foot',
+    location_prompt: '📍 Enter your location to sort by distance',
+    location_placeholder: 'e.g., Ulsan Station, Taehwa-dong...',
+    gps_btn: 'My Location',
+    search_btn: 'Search',
+    cat_all: 'All',
+    cat_junggu: 'Jung-gu',
+    cat_trail: 'Trails',
+    cat_namgu: 'Nam-gu',
+    detail_btn: 'Learn More',
+    close_btn: 'Close',
+    naver_map: 'Naver Map',
+    google_map: 'Google Map',
+    tips_title: '💡 Tips',
+    seasons_title: '🗓️ Seasonal Guide',
+    caution_title: '⚠️ Things to Note',
+    distance_prefix: '~',
+    distance_suffix: '',
+    gps_loading: 'Finding your location...',
+    gps_found: '📍 Location found!',
+    gps_error: 'Could not find location. Please enter an address.',
+    footer: 'Create your own story on the beautiful paths of Ulsan.',
+    from_here: 'from here'
+  },
+  ja: {
+    hero_label: 'ULSAN LOCAL GUIDE',
+    hero_subtitle: '歩いて発見する蔚山の隠れた名所',
+    location_prompt: '📍 位置を入力すると近い順に並べ替えます',
+    location_placeholder: '例: 蔚山駅、太和洞...',
+    gps_btn: '現在地',
+    search_btn: '検索',
+    cat_all: '全て',
+    cat_junggu: '中区',
+    cat_trail: '散策路',
+    cat_namgu: '南区',
+    detail_btn: '詳しく見る',
+    close_btn: '閉じる',
+    naver_map: 'Naverマップ',
+    google_map: 'Googleマップ',
+    tips_title: '💡 ヒント',
+    seasons_title: '🗓️ 季節ガイド',
+    caution_title: '⚠️ 注意事項',
+    distance_prefix: '約',
+    distance_suffix: '',
+    gps_loading: '位置を検索中...',
+    gps_found: '📍 位置が見つかりました！',
+    gps_error: '位置が見つかりません。住所を入力してください。',
+    footer: '蔚山の美しい道で、あなただけの物語を作りましょう。',
+    from_here: 'ここから'
+  },
+  zh: {
+    hero_label: 'ULSAN LOCAL GUIDE',
+    hero_subtitle: '漫步发现蔚山的隐藏宝藏',
+    location_prompt: '📍 输入位置按距离排序',
+    location_placeholder: '例: 蔚山站、太和洞...',
+    gps_btn: '当前位置',
+    search_btn: '搜索',
+    cat_all: '全部',
+    cat_junggu: '中区',
+    cat_trail: '散步路',
+    cat_namgu: '南区',
+    detail_btn: '查看详情',
+    close_btn: '收起',
+    naver_map: 'Naver地图',
+    google_map: 'Google地图',
+    tips_title: '💡 小贴士',
+    seasons_title: '🗓️ 季节指南',
+    caution_title: '⚠️ 注意事项',
+    distance_prefix: '约',
+    distance_suffix: '',
+    gps_loading: '正在查找位置...',
+    gps_found: '📍 已找到位置！',
+    gps_error: '无法找到位置，请手动输入地址。',
+    footer: '在蔚山美丽的路上，创造属于你的故事。',
+    from_here: '从这里'
+  }
+};
+
+// ===== STATE =====
+let currentLang = 'ko';
+let currentCat = 'all';
+let userLat = null;
+let userLng = null;
+let sortedSpots = [...SPOTS];
+
+// ===== CONFIG =====
+const defaultConfig = {
+  site_title: '울산, 여기 어때?',
+  hero_subtitle: '걸으며 발견하는 울산의 숨은 명소들',
+  background_color: '#f5f0eb',
+  surface_color: '#ffffff',
+  text_color: '#2d2a26',
+  primary_action_color: '#a78b6e',
+  secondary_action_color: '#3e4f5f',
+  font_family: 'Gowun Batang',
+  font_size: 16
+};
+
+// ===== DISTANCE =====
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function formatDist(km) {
+  const t = I18N[currentLang];
+  if (km < 1) return `${t.distance_prefix} ${Math.round(km*1000)}m ${t.distance_suffix}`.trim();
+  return `${t.distance_prefix} ${km.toFixed(1)}km ${t.distance_suffix}`.trim();
+}
+
+function sortByDistance() {
+  if (userLat === null) return;
+  sortedSpots = [...SPOTS].map(s => ({
+    ...s,
+    dist: haversine(userLat, userLng, s.lat, s.lng)
+  })).sort((a, b) => a.dist - b.dist);
+  renderSpots();
+}
+
+// ===== GPS =====
+function getMyLocation() {
+  const status = document.getElementById('location-status');
+  status.classList.remove('hidden');
+  status.textContent = I18N[currentLang].gps_loading;
+
+  if (!navigator.geolocation) {
+    status.textContent = I18N[currentLang].gps_error;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      status.textContent = I18N[currentLang].gps_found;
+      sortByDistance();
+      setTimeout(() => status.classList.add('hidden'), 2000);
+    },
+    () => {
+      status.textContent = I18N[currentLang].gps_error;
+    }
+  );
+}
+
+function searchLocation() {
+  const input = document.getElementById('location-input').value.trim();
+  if (!input) return;
+  // Simple geocoding using known Ulsan landmarks
+  const knownPlaces = {
+    '울산역': [35.5555, 129.2478], 'ulsan station': [35.5555, 129.2478],
+    '태화동': [35.5462, 129.2927], 'taehwa': [35.5462, 129.2927],
+    '삼산동': [35.5366, 129.3252], 'samsan': [35.5366, 129.3252],
+    '무거동': [35.5267, 129.2956], 'mugeo': [35.5267, 129.2956],
+    '성남동': [35.5554, 129.3145], 'seongnam': [35.5554, 129.3145],
+    '중앙동': [35.5600, 129.3180], 'jungangdong': [35.5600, 129.3180],
+    '신정동': [35.5480, 129.3200], 'shinjeong': [35.5480, 129.3200],
+    '울산대학교': [35.5427, 129.2561], 'ulsan university': [35.5427, 129.2561],
+    '울산시청': [35.5397, 129.3114], 'ulsan city hall': [35.5397, 129.3114],
+    '장생포': [35.5082, 129.3728], 'jangsaengpo': [35.5082, 129.3728],
+  };
+
+  const key = Object.keys(knownPlaces).find(k => input.toLowerCase().includes(k.toLowerCase()));
+  const status = document.getElementById('location-status');
+  status.classList.remove('hidden');
+
+  if (key) {
+    userLat = knownPlaces[key][0];
+    userLng = knownPlaces[key][1];
+    status.textContent = I18N[currentLang].gps_found;
+    sortByDistance();
+    setTimeout(() => status.classList.add('hidden'), 2000);
+  } else {
+    // Default to Ulsan city center
+    userLat = 35.5397;
+    userLng = 129.3114;
+    status.textContent = I18N[currentLang].gps_found + ' (울산 시청 기준)';
+    sortByDistance();
+    setTimeout(() => status.classList.add('hidden'), 3000);
+  }
+}
+
+// ===== RENDER =====
+function renderSpots() {
+  const container = document.getElementById('spots-container');
+  const t = I18N[currentLang];
+  const filtered = currentCat === 'all' ? sortedSpots : sortedSpots.filter(s => s.cat === currentCat);
+
+  container.innerHTML = '';
+
+  filtered.forEach((spot, i) => {
+    const info = spot.i18n[currentLang];
+    const delay = i * 0.15;
+    const distHtml = spot.dist !== undefined
+      ? `<span class="dist-badge inline-block px-3 py-1 rounded-full text-xs font-medium text-[#5a6a70]">${formatDist(spot.dist)} ${t.from_here}</span>`
+      : '';
+
+    const card = document.createElement('div');
+    card.className = 'spot-card walk-in bg-white rounded-2xl shadow-md overflow-hidden relative';
+    card.style.animationDelay = `${delay}s`;
+    card.dataset.spotId = spot.id;
+
+    // Walking dot indicator
+    const dot = `<div class="absolute -left-10 md:-left-14 top-8 w-5 h-5 rounded-full bg-[#a78b6e] border-4 border-[#f5f0eb] z-10 gentle-pulse" style="animation-delay:${delay}s"></div>`;
+
+    card.innerHTML = `
+      ${dot}
+      <div class="p-5 md:p-6">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-2xl">${spot.imgPlaceholder}</span>
+              <h3 class="text-xl font-bold text-[#2d2a26] serif">${info.name}</h3>
+            </div>
+            <p class="text-sm text-[#8a8279]">${info.area}</p>
+          </div>
+          <div class="flex flex-wrap gap-2 items-center">
+            ${distHtml}
+            <span class="${info.seasonClass} px-3 py-1 rounded-full text-xs font-medium">${info.seasonBadge}</span>
+          </div>
+        </div>
+
+        <!-- Image placeholder area -->
+        <div class="img-wrap h-48 md:h-56 bg-gradient-to-br from-[#e8dfd4] to-[#d4cdc2] rounded-xl mb-4 flex items-center justify-center" id="img-${spot.id}">
+          ${spot.imgHtml || `<span class="text-6xl opacity-30">${spot.imgPlaceholder}</span>`}
+        </div>
+
+        <p class="text-[#5a5550] leading-relaxed mb-4">${info.desc}</p>
+
+        <!-- Map links -->
+        <div class="flex flex-wrap gap-2 mb-3">
+          <a href="${spot.naverMap}" target="_blank" rel="noopener noreferrer"
+            class="map-link inline-flex items-center gap-1 bg-[#1EC800]/10 text-[#1EC800] px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-[#1EC800]/20 transition">
+            <i data-lucide="map-pin" style="width:14px;height:14px"></i> ${t.naver_map}
+          </a>
+          <a href="${spot.googleMap}" target="_blank" rel="noopener noreferrer"
+            class="map-link inline-flex items-center gap-1 bg-[#4285F4]/10 text-[#4285F4] px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-[#4285F4]/20 transition">
+            <i data-lucide="map" style="width:14px;height:14px"></i> ${t.google_map}
+          </a>
+        </div>
+
+        <!-- Detail toggle -->
+        <button onclick="toggleDetail('${spot.id}')" class="detail-toggle text-[#a78b6e] hover:text-[#8b7258] text-sm font-medium flex items-center gap-1 transition" id="toggle-${spot.id}">
+          <i data-lucide="chevron-down" style="width:16px;height:16px" class="transition-transform"></i>
+          <span>${t.detail_btn}</span>
+        </button>
+
+        <!-- Detail panel -->
+        <div class="detail-panel" id="detail-${spot.id}">
+          <div class="space-y-4 pt-2">
+            <div class="bg-[#f9f6f2] rounded-xl p-4">
+              <p class="text-[#4a453f] leading-relaxed">${info.detail}</p>
+            </div>
+
+            <div class="bg-[#fdf8f0] rounded-xl p-4">
+              <h4 class="font-bold text-[#a78b6e] mb-2 text-sm">${t.tips_title}</h4>
+              <div class="text-sm text-[#5a5550] whitespace-pre-line leading-relaxed">${info.tips}</div>
+            </div>
+
+            <div class="bg-[#f0f6f0] rounded-xl p-4">
+              <h4 class="font-bold text-[#5a8a5a] mb-2 text-sm">${t.seasons_title}</h4>
+              <p class="text-sm text-[#5a5550] leading-relaxed">${info.seasons}</p>
+            </div>
+
+            <div class="bg-[#fff5f5] rounded-xl p-4">
+              <h4 class="font-bold text-[#c45a5a] mb-2 text-sm">${t.caution_title}</h4>
+              <div class="text-sm text-[#5a5550] whitespace-pre-line leading-relaxed">${info.caution}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  lucide.createIcons();
+}
+
+function toggleDetail(id) {
+  const panel = document.getElementById(`detail-${id}`);
+  const btn = document.getElementById(`toggle-${id}`);
+  const t = I18N[currentLang];
+  const isOpen = panel.classList.contains('open');
+
+  panel.classList.toggle('open');
+  const icon = btn.querySelector('i');
+  icon.style.transform = isOpen ? '' : 'rotate(180deg)';
+  btn.querySelector('span').textContent = isOpen ? t.detail_btn : t.close_btn;
+}
+
+// ===== LANGUAGE =====
+function setLanguage(lang) {
+  currentLang = lang;
+  const t = I18N[lang];
+
+  // Update lang buttons
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+
+  // Update static i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key]) el.textContent = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    if (t[key]) el.placeholder = t[key];
+  });
+
+  // Update category buttons
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    const key = b.dataset.i18n;
+    if (key && t[key]) b.textContent = t[key];
+  });
+
+  // Update html lang
+  document.documentElement.lang = lang === 'ko' ? 'ko' : lang === 'ja' ? 'ja' : lang === 'zh' ? 'zh' : 'en';
+
+  renderSpots();
+}
+
+// ===== CATEGORY FILTER =====
+function setCategory(cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => {
+    if (b.dataset.cat === cat) {
+      b.className = 'cat-btn active bg-[#3e4f5f] text-white px-4 py-2 rounded-full text-sm transition';
+    } else {
+      b.className = 'cat-btn bg-white text-[#5a6a70] px-4 py-2 rounded-full text-sm hover:bg-[#3e4f5f] hover:text-white transition';
+    }
+  });
+  renderSpots();
+}
+
+// ===== ELEMENT SDK =====
+function applyConfig(config) {
+  const c = { ...defaultConfig, ...config };
+  const font = c.font_family || defaultConfig.font_family;
+  const size = c.font_size || defaultConfig.font_size;
+
+  document.getElementById('hero-title').textContent = c.site_title;
+  document.getElementById('nav-title').textContent = c.site_title;
+  document.getElementById('hero-subtitle').textContent = c.hero_subtitle;
+  document.title = c.site_title;
+
+  document.body.style.backgroundColor = c.background_color;
+  document.querySelectorAll('.spot-card').forEach(el => el.style.backgroundColor = c.surface_color);
+  document.querySelectorAll('.serif').forEach(el => {
+    el.style.fontFamily = `${font}, 'Gowun Batang', serif`;
+  });
+
+  // Font size scaling
+  document.querySelectorAll('h1').forEach(el => el.style.fontSize = `${size * 2.5}px`);
+  document.querySelectorAll('h3').forEach(el => el.style.fontSize = `${size * 1.3}px`);
+  document.querySelectorAll('p').forEach(el => { if (!el.closest('.dist-badge')) el.style.fontSize = `${size}px`; });
+}
+
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => applyConfig(config),
+  mapToCapabilities: (config) => ({
+    recolorables: [
+      { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); }},
+      { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); }},
+      { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); }},
+      { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: (v) => { config.primary_action_color = v; window.elementSdk.setConfig({ primary_action_color: v }); }},
+      { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: (v) => { config.secondary_action_color = v; window.elementSdk.setConfig({ secondary_action_color: v }); }}
+    ],
+    borderables: [],
+    fontEditable: {
+      get: () => config.font_family || defaultConfig.font_family,
+      set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+    },
+    fontSizeable: {
+      get: () => config.font_size || defaultConfig.font_size,
+      set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+    }
+  }),
+  mapToEditPanelValues: (config) => new Map([
+    ['site_title', config.site_title || defaultConfig.site_title],
+    ['hero_subtitle', config.hero_subtitle || defaultConfig.hero_subtitle]
+  ])
+});
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Language buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setLanguage(btn.dataset.lang));
+  });
+
+  // Category buttons
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => setCategory(btn.dataset.cat));
+  });
+
+  // Enter key on location input
+  document.getElementById('location-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); searchLocation(); }
+  });
+
+  renderSpots();
+  lucide.createIcons();
+});
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f2fedf401e6aa68',t:'MTc3NzMxNDk1My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
